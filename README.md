@@ -1,19 +1,5 @@
 # dictionary-app
 
-## Project setup
-```
-npm install
-```
+I'm currently learning Vue and this is one of my starter projects.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Making use of the composition Api and kearning more about refs, components and routers. Pretty cool.
