@@ -18,7 +18,9 @@
           <p class="error" v-if="sound">No Sound</p>
           <p ref="pos" class="pos"></p>
           <p ref="phonetic"></p>
-          <p ref="definition"></p>
+          <div v-for="definition in definitionsArray" :key="definition">
+            {{ definition }}
+          </div>
       </div>  
       <div class="mx-auto">
         <button @click="changeTheme" class="theme mt-3 p-2 border-0 rounded">
@@ -40,18 +42,26 @@ export default {
     let validQuery = ref(true)
     let sound = ref(false)
     const word = ref("")
-    const definition = ref(null)
+    const definitionsArray = ref([])
     const phonetic = ref(null)
     const pos = ref(null)
 
     const getDefinition = async () => {
+      definitionsArray.value.splice(0, definitionsArray.value.length)
       try {
         const url = " https://api.dictionaryapi.dev/api/v2/entries/en/ " + word.value
         const {data} = await axios.get(url)
         phonetic.value.textContent = data[0].phonetics[1].text
         pos.value.textContent = data[0].meanings[0].partOfSpeech
-        definition.value.textContent = data[0].meanings[0].definitions[0].definition
-        console.log(data[0]);
+        data.map(({meanings}) => {
+          meanings.map(({definitions}) => {
+            definitions.forEach(({definition}) => {
+              if (typeof definition === "string") {
+                definitionsArray.value.push(definition)
+              }
+            })
+          })
+        })
         sound.value = false
       } catch (err) {
         validQuery.value = false
@@ -65,7 +75,6 @@ export default {
         let audio = data[0].phonetics[1].audio
         new Audio(audio).play()
         validQuery.value = true
-        console.log(data[0]);
       } catch(err) {
           sound.value = true
       }
@@ -75,7 +84,7 @@ export default {
       const element = document.body
       element.classList.toggle("lightmode")
     }
-    return {pos, changeTheme, validQuery, word, getDefinition, definition, phonetic, getAudio, sound}
+    return {definitionsArray, pos, changeTheme, validQuery, word, getDefinition, phonetic, getAudio, sound}
   }
 }
 </script>
