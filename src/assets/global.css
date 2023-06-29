@@ -89,3 +89,9 @@ body {
     margin-top: 15px;
 }
 .pos {color: lightsalmon;}
+
+@media (min-width: 668px) {
+    * {
+        font-size: 1.2rem;
+    }
+}
