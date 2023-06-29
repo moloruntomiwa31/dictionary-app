@@ -8,7 +8,7 @@
           <button class="btn1" @click="getDefinition"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5l-1.5 1.5l-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16A6.5 6.5 0 0 1 3 9.5A6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14S14 12 14 9.5S12 5 9.5 5Z"/></svg> search</button>
         </div>
         <p v-if="!validQuery" class="error">Error in getting some data.</p>
-        <div class="dictionary container">
+        <div class="dictionary container" v-if="dataIsHere">
           <div class="d-flex justify-content-between w-80">
             <h2>{{ word }}</h2>
             <button class="sound" @click="getAudio">
@@ -19,10 +19,10 @@
           <p ref="pos" class="pos"></p>
           <p ref="phonetic"></p>
           <div v-for="definition in definitionsArray" :key="definition">
-            {{ definition }}
+            <p class="pt-1">{{ definition }}</p>
           </div>
       </div>  
-      <div class="mx-auto">
+      <div class="mx-auto pb-1">
         <button @click="changeTheme" class="theme mt-3 p-2 border-0 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 20 20"><path fill="currentColor" d="M10 3.5a6.5 6.5 0 1 1 0 13v-13ZM10 2a8 8 0 1 0 0 16a8 8 0 0 0 0-16Z"/></svg>
         </button>
@@ -41,6 +41,7 @@ export default {
   setup() {
     let validQuery = ref(true)
     let sound = ref(false)
+    const dataIsHere = ref(false)
     const word = ref("")
     const definitionsArray = ref([])
     const phonetic = ref(null)
@@ -50,11 +51,14 @@ export default {
       definitionsArray.value.splice(0, definitionsArray.value.length)
       try {
         const url = " https://api.dictionaryapi.dev/api/v2/entries/en/ " + word.value
+        dataIsHere.value = true
         const {data} = await axios.get(url)
         phonetic.value.textContent = data[0].phonetics[1].text
         pos.value.textContent = data[0].meanings[0].partOfSpeech
+        console.log(data)
         data.map(({meanings}) => {
           meanings.map(({definitions}) => {
+
             definitions.forEach(({definition}) => {
               if (typeof definition === "string") {
                 definitionsArray.value.push(definition)
@@ -62,6 +66,7 @@ export default {
             })
           })
         })
+        validQuery.value = true
         sound.value = false
       } catch (err) {
         validQuery.value = false
@@ -84,7 +89,7 @@ export default {
       const element = document.body
       element.classList.toggle("lightmode")
     }
-    return {definitionsArray, pos, changeTheme, validQuery, word, getDefinition, phonetic, getAudio, sound}
+    return {dataIsHere, definitionsArray, pos, changeTheme, validQuery, word, getDefinition, phonetic, getAudio, sound}
   }
 }
 </script>
